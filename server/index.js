@@ -1,20 +1,25 @@
 require('dotenv').config();
-const express = require("express");
+const express = require('express');
+const cors = require('cors');
+const connectDB = require('./config/db');
+const taskRoutes = require('./routes/taskRouter');
+
+
 const app = express();
-require("./models/db");
-const PORT = process.env.PORT || 5000;
-const taskRouter = require('./routes/taskRouter');
-const bodyParser = require('body-parser');
 
-app.get('/', (req, res)=>{
-    res.send("App is running");
-})
+// Middleware
+app.use(cors({
+  origin: 'http://localhost:5173',
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true
+}));
+app.use(express.json());
 
-app.use(bodyParser.json());
+// Connect to DB
+connectDB();
 
-app.use('/tasks',taskRouter);
 
-app.listen(PORT, ()=>{
-    console.log(`server is running on port number ${PORT}`);
+app.use('/api/tasks', taskRoutes);
 
-})
+const PORT = process.env.PORT || 8080;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
